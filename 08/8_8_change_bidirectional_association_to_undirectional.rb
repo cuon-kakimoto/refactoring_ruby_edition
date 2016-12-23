@@ -1,4 +1,4 @@
-#
+# TODO: 双方向リンクのままなので、片方向へ変更する。加えてメソッドを追加して試験できるようにする。
 # 片方向リンク
 # Order+------>Customer
 #      *      1
@@ -14,10 +14,7 @@
 #   Order belong_to Customer
 
 require 'set'
-# OPTIMIZE: 関係が一対多なら、一個の参照を持つほうがリンクを管理する(つまり、Order)
 class Order
-  # OPTIMIZE: アクセサのオーバライド
-  # attr_accessor :customer
   attr_reader :customer
 
   def initialize(customer)
@@ -36,8 +33,6 @@ end
 
 class Customer
   attr_accessor :name
-  # OPTIMIZE: CustomerはOrderを複数持つことができるため、CustomerでOrderを管理する
-  # OPTIMIZE: 重複を許可しないため、集合で管理する
   def initialize(name)
     @name = name
     @orders = Set.new
@@ -45,12 +40,9 @@ class Customer
 
 
   def friend_orders
-    # Orderがリンクを更新したときのみ使われる
-    # #<Set: {#<Order:0x007f9e8f179618 @customer=#<Customer:0x007f9e8f17a090 @name="me", @orders=#<Set: {...}>>>}>
     @orders
   end
 
-  # OPTIMIZE: Customer側からOrderを追加
   def add_order(order)
     order.customer = self
   end
