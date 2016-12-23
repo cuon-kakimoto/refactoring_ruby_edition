@@ -54,7 +54,6 @@ class Client
   end
 end
 
-
 require 'test/unit'
 
 class OrderTest < Test::Unit::TestCase
