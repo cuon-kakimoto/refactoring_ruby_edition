@@ -18,6 +18,7 @@ class Order
 
   # OPTIMIZE: OrderとCustomerは一対一に対応(Customerは値オブジェクト)。
   # 値オブジェクトは書き変え不能であるべき
+  # 8-4のeql/==/hashをオーバライドする対応をすれば不要か?
   def customer=(value)
     @customer = Customer.new(value)
   end
