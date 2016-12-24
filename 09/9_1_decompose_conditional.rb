@@ -14,6 +14,7 @@ class Event
   def charge(date, quantity)
     # OPTIMIZE: 目的から名前をつけたメソッド呼び出しを置き、明確なメッセージを伝える
     # HACK: privateメソッドに処理を書いて、publicはコードが分かるようにするのがベストかな-> んー、それに限らす全体が読めるようにかな。
+    # HACK: 関数型のほうがテストは楽そう。。。
     if not_summer(date)
       winter_charge(quantity)
     else
