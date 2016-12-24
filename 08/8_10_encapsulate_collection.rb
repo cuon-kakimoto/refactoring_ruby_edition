@@ -7,13 +7,14 @@ class Course
     @advanced = advanced
   end
 
-  # TODO: *?ってこういう書き方になるんだっけ?
+  # HACK: *?は条件分岐ひつようなし。
   def advanced?
-    if advanced
-      true
-    else
-      false
-    end
+    @advanced
+    # if advanced
+    #   true
+    # else
+    #   false
+    # end
   end
 end
 
