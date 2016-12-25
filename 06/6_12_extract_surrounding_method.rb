@@ -20,6 +20,9 @@ class Person
   # OPTIMIZE: 再帰処理をなくす。呼び出し元がブロックを渡して、ロジックを組み込む
   # OPTIMIZE: ビジネスロジックと反復処理を分離して、メンテンナスをしやすくする
   def number_of_living_descendants
+    # HACK: ブロック: { |ブロック変数| 処理 }
+    # 通常のメソッド呼び出しは、メソッド側で定義されたコードしか利用できない
+    # ブロック付きメソッド呼び出しは、呼び出す側から別のコード(ブロック)を挿入することができる。-> 高階関数を渡しているようなイメージだな。
     count_descendants_matching{ |descendant| descendant.alive? }
     # children.reduce(0) do |count, child|
     #   count += 1 if child.alive?
@@ -45,7 +48,9 @@ protected
   # OPTIMIZE: ロジックを呼び出し元に渡させることで、条件によって数え上げるだけの関数になってる!!
   def count_descendants_matching(&block)
     children.reduce(0) do |count, child|
-      # OPTIMIZE: 呼び出し元にchildをyield
+      # HACK: 呼び出し側(number_of_*)で定義されたコード(ブロック)が挿入される。
+      # そして、childをブロック変数に使用。
+      # HACK: ここでブロックが展開されて、割り当てられると考えたほうがよいな
       count += 1 if yield child
       count + child.count_descendants_matching(&block)
     end
