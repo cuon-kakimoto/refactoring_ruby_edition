@@ -19,6 +19,10 @@ class Movie
   attr_reader :title
   attr_reader :price_code
 
+  # HACK: ARならば、price_codeを保持して、initalizeをフックさせてPriceを注入するのが良いかと。
+  # Clientから依存性を注入されるよりは、DBをFacotry的な感じで扱ったほうがいいかなー。
+  # STIするよりも動的に依存性を注入したほうが良いんではないかな？
+  # => すくなくとも流動的要素を曖昧にしたままのSTIはNGじゃない?
   def price_code=(value)
     @price_code = value
     @price = case price_code

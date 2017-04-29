@@ -25,6 +25,7 @@ class Movie
 
   # OPTIMIZE: ビデオの種類(price_code)は流動的なため、ビデオの種類は外に公開しない。
   # Movieの中で料金を計算することを選ぶ
+  # ここは、いわゆるダックタイピング
   def charge(days_rented)
     @price.charge(days_rented)
   end
