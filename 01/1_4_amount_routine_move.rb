@@ -19,7 +19,7 @@ class Rental
   end
 
   # OPTIMIZE: べき等（何度実行しても同じ結果になる)にできているか
-  # 副作用がなくなる
+  # 副作用がなくなる. べき等大事！！！
   def charge
     result = 0
     case movie.price_code
@@ -51,6 +51,7 @@ class Customer
     total_amount, frequent_rental_points = 0, 0
     result = "Rental Record for #{@name}\n"
     @rentals.each do |element|
+      # 一時変数は無い方が良い。
 
       # レンタルポイントを加算
       frequent_rental_points += 1
@@ -69,7 +70,7 @@ class Customer
     result
   end
 
-  # OPTIMIZE: Movieクラスへ移動。Customerクラスの情報を使用していないため。
+  # OPTIMIZE: Rentalクラスへ移動。Customerクラスの情報を使用していないため。
   # -> メソッドは使っているデータを持つオブジェクトに割り当てるべき
   # 使用していないが、公開インターフェスを変えないために保持
   def amount_for(rental)

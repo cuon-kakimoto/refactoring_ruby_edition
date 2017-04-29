@@ -1,13 +1,77 @@
+########################################
+# direction: ビデオ料金
+#  Stateパターン: ビデオの状態(新作旧作など)
+#  Strategyパターン: ビデオの料金計算アルゴリズム
+#  今回の"流動的要素"は、ビデオの状態のためStateパターンを採用する
+########################################
+
+module DefaultPrice
+  def frequent_renter_points(days_rented)
+    1
+  end
+end
+
 class Movie
   REGULAR = 0
   NEW_RELEASE = 1
   CHILDRENS = 2
 
   attr_reader :title
-  attr_accessor :price_code
+  attr_reader :price_code
 
-  def initialize(title, price_code)
-    @title, @price_code = title, price_code
+  def price_code=(value)
+    @price_code = value
+    @price = case price_code
+             when REGULAR
+               RegularPrice.new
+             when NEW_RELEASE
+               NewReleasePrice.new
+             when CHILDRENS
+               ChilderensPrice.new
+             end
+  end
+
+  def initialize(title, the_price_code)
+    @title, self.price_code = title, the_price_code
+  end
+
+  # OPTIMIZE: ビデオの種類(price_code)は流動的なため、ビデオの種類は外に公開しない。
+  # Movieの中で料金を計算することを選ぶ
+  def charge(days_rented)
+    @price.charge(days_rented)
+  end
+
+  def frequent_renter_points(days_rented)
+    (price_code == NEW_RELEASE && days_rented > 1 ) ? 2 : 1
+  end
+end
+
+class RegularPrice
+  include DefaultPrice
+  def charge(days_rented)
+    result = 2
+    result += (days_rented - 2) * 1.5 if days_rented > 2
+    result
+  end
+end
+
+class NewReleasePrice
+  def charge(days_rented)
+    days_rented * 3
+  end
+
+  def frequent_renter_points(days_rented)
+    days_rented > 1 ? 2 : 1
+  en
+  end
+end
+
+class ChilderensPrice
+  include DefaultPrice
+  def charge(days_rented)
+    result = 1.5
+    result += (days_rented - 3) * 1.5 if days_rented > 3
+    result
   end
 end
 
@@ -20,23 +84,13 @@ class Rental
 
   # OPTIMIZE: べき等（何度実行しても同じ結果になる)にできているか
   # 副作用がなくなる
+  # OPTIMIZE: Movieクラスオブジェクトの値に基づいて条件分岐していたため、Movieへ移動
   def charge
-    result = 0
-    case movie.price_code
-    when Movie::REGULAR
-      result += 2
-      result += (days_rented - 2) * 1.5 if days_rented > 2
-    when Movie::NEW_RELEASE
-      result += days_rented * 3
-    when Movie::CHILDRENS
-      result += 1.5
-      result += (days_rented - 3 ) * 1.5 if days_rented > 3
-    end
-    result
+    movie.charge(days_rented)
   end
 
   def frequent_renter_points
-    (movie.price_code == Movie::NEW_RELEASE && days_rented > 1 ) ? 2 : 1
+    movie.frequent_renter_points(days_rented)
   end
 end
 
@@ -92,7 +146,6 @@ class Customer
 private
 
   # OPTIMIZE:「ループ」ではなく「コレクションクロージャメソッド」を適用
-  # HACK: インスタンス変数はいたるところで使える。(インスタンス変数の引数渡しはアリえないよね。)
   def total_charge
     @rentals.reduce(0) { |sum, rental| sum + rental.charge }
   end

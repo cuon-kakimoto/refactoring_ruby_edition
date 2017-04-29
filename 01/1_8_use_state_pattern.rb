@@ -1,3 +1,8 @@
+########################################
+# direction: case文を削除して、呼び出し元に型インスタンスを生成させる。
+# 最後のひとつでごっそり処理が変わってた。
+########################################
+
 # OPTIMIZE: モジュール抽出
 module DefaultPrice
   def frequent_renter_points(days_rented)
@@ -6,26 +11,9 @@ module DefaultPrice
 end
 
 class Movie
-  # REGULAR = 0
-  # NEW_RELEASE = 1
-  # CHILDRENS = 2
 
   attr_reader :title
-  # attr_reader :price_code
   attr_writer :price
-
-  # OPTIMIZE: Stateパターンの使用
-  # def price_code=(value)
-  #   @price_code = value
-  #   @price = case price_code
-  #            when REGULAR
-  #              RegularPrice.new
-  #            when NEW_RELEASE
-  #              NewReleasePrice.new
-  #            when CHILDRENS
-  #              ChilderensPrice.new
-  #            end
-  # end
 
   # OPTIMIZE: 呼び出し元に型自体のインスタンスを渡させるため、price_codeは不要
   # def initialize(title, the_price_code)
@@ -45,8 +33,14 @@ class Movie
   def frequent_renter_points(days_rented)
     @price.frequent_renter_points(days_rented)
   end
+
+  # HACK: 下記のメソッドを定義しておけば動的にpriceを変えれる。
+  # railsで初期化時に依存性を注入するのってどうやるんだろう？
+  # def price=
 end
 
+# HACK: stateパターン。
+# ちなみに、UMLでは、抽象は<<protocol>>としてる 。動的型付けポリモーフィズム。
 class RegularPrice
   include DefaultPrice
   def charge(days_rented)
@@ -160,7 +154,7 @@ require "test/unit"
 class VideoRentalTest < Test::Unit::TestCase
   def test_statement
     customer = Customer.new('Chap')
-    # OPTIMIZE: 呼び出し元に型自体のインスタンスを割り当てる
+    # OPTIMIZE: 呼び出し元に型自体のインスタンスを割り当てる。流動的要素を注入!
     movie1 = Movie.new("Joe Versus the Volcano", RegularPrice.new)
     rental1 = Rental.new(movie1, 5)
     customer.add_rental(rental1)
