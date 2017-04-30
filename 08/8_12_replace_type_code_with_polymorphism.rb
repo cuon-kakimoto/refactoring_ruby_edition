@@ -1,8 +1,14 @@
-# OPTIMIZE: 条件分岐を取り除く
-#  手段としては以下の3つ
-# 「タイプコードからポリモーフィズムへ」 - タイプコードのある箇所がクラスの主要部分の場合に選択
-# 「タイプコードからモジュールのextendへ」 - タイプコードに依存しない振る舞い
-# 「タイプコードからState/Strategyへ」 - タイプコタイプコードに依存しない振る舞い
+########################################
+# タイプコードからポリモーフィズムへ。
+# - 1. 「タイプコードからポリモーフィズムへ」
+# [MEMO]
+# - まさにMountainBikeのメイン処理をmodule化してるなー。
+# - => initialize処理がmodule内にあるからな。
+# - <module MountainBike>
+# - <- RigidMountainBike, FrontSuspensionMountainBike, FullSuspensionMountainBike
+# - こんなクラス構成になる。ただ3以上になるときつい気がするけど。
+# - とりうるcodeが10,20もいくと、これはきついっすね。
+########################################
 
 # OPTIMIZE: Rubyのダックタイプを使うためモジュールに変更
 # class MountainBike
@@ -19,28 +25,9 @@ module MountainBike
 
   # OPTIMIZE: 各クラスに移動したため不要
   # def off_road_ability
-  #   result = @tire_width * TIRE_WIDTH_FACTOR
-  #   if @type_code == :front_suspension || @type_code == :full_suspension
-  #     result += @front_fork_travel * FRONT_SUSPENSION_FACTOR
-  #   end
-  #   if @type_code == :full_suspension
-  #     result += @rear_fork_travel * REAR_SUSPENSION_FACTOR
-  #   end
-  #   result
   # end
 
   # def price
-  #   case @type_code
-  #   when :rigid
-  #     # ( 1 + @commission ) * @base_price
-  #     raise "shouldn't get here"
-  #   when :front_suspension
-  #     # ( 1 + @commission ) * @base_price + @front_suspension_price
-  #     raise "shouldn't get here"
-  #   when :full_suspension
-  #     # ( 1 + @commission ) * @base_price + @front_suspension_price + @rear_suspension_price
-  #     raise "shouldn't get here"
-  #   end
   # end
 end
 
@@ -85,7 +72,8 @@ require 'test/unit'
 class MountainBikeTest < Test::Unit::TestCase
 
   # HACK: ひとつのクラスでタイプコードに分けた処理を新規クラスを作成して条件分岐をなくす。
-  # でも、オブジェクト作成時はオーナーがどうしても選ぶ必要がある!?
+  # でも、オブジェクト作成時はオーナーがどうしても選ぶ必要がある!?->yes
+  # 代替手段はFacotryに委譲して、ownerは使うだけにする。
   def setup
     @bike1 = RigidMountainBike.new(
       # :type_code => :rigid,

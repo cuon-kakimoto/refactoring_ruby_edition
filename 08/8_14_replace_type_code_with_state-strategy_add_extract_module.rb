@@ -1,3 +1,10 @@
+########################################
+# タイプコードからポリモーフィズムへ。
+# - 3. 「タイプコードからState/Strategyへ」最後のmodule抽出を追加
+# [MEMO]
+# - module定義のうまい方法。インスタンス変数を使うかとか、そういうこまい所。
+########################################
+
 require 'forwardable'
 class MountainBike
   TIRE_WIDTH_FACTOR = 1
@@ -28,18 +35,22 @@ class MountainBike
   end
 end
 
-# #TODO: モジュールが状態をもつことがイケてない。。。
-# 入力と出力が一定にならない。
+# TODO: モジュール内でインスタンス変数使うのどうなんですかね？？？
+# self.tire_widthだと、accessorを追加しなければならないのでめんどくさい。
+# 現状は、@tire_widthに応答できるオブジェクトであればよい、という文脈
+# 一応他でも@tire_witdhのコードはある。
 module DefaultMountainBike
-  def default_off_road_ability(bike)
-    bike.tire_width * MountainBike::TIRE_WIDTH_FACTOR
+  def default_off_road_ability
+    @tire_width * MountainBike::TIRE_WIDTH_FACTOR
+  end
+
+  def defalut_price
+    ( 1 + @commission ) * @base_price
   end
 end
 
 class RigidMountainBike
   include DefaultMountainBike
-  # TODO: 前回のリファクタリングでリーダーを消してるんだけどな。。。
-  attr_reader :tire_width
   def initialize(params)
     @tire_width = params[:tire_width]
     @commission = params[:commission]
@@ -47,12 +58,11 @@ class RigidMountainBike
   end
 
   def off_road_ability
-    default_off_road_ability(self)
-    # @tire_width * MountainBike::TIRE_WIDTH_FACTOR
+    default_off_road_ability
   end
 
   def price
-    ( 1 + @commission ) * @base_price
+    defalut_price
   end
 
   def upgradable_parameters
@@ -66,6 +76,7 @@ class RigidMountainBike
 end
 
 class FrontSuspensionMountainBike
+  include DefaultMountainBike
   def initialize(params)
     @tire_width        = params[:tire_width]
     @front_fork_travel = params[:front_fork_travel]
@@ -75,12 +86,11 @@ class FrontSuspensionMountainBike
   end
 
   def off_road_ability
-    default_off_road_ability(self)
-    @tire_width * MountainBike::TIRE_WIDTH_FACTOR + @front_fork_travel * MountainBike::FRONT_SUSPENSION_FACTOR
+    default_off_road_ability + @front_fork_travel * MountainBike::FRONT_SUSPENSION_FACTOR
   end
 
   def price
-    ( 1 + @commission ) * @base_price + @front_suspension_price
+     defalut_price + @front_suspension_price
   end
 
   def upgradable_parameters
@@ -95,6 +105,7 @@ class FrontSuspensionMountainBike
 end
 
 class FullSuspensionMountainBike
+  include DefaultMountainBike
   def initialize(params)
     @tire_width        = params[:tire_width]
     @front_fork_travel = params[:front_fork_travel]
@@ -106,11 +117,11 @@ class FullSuspensionMountainBike
   end
 
   def off_road_ability
-    @tire_width * MountainBike::TIRE_WIDTH_FACTOR + @front_fork_travel * MountainBike::FRONT_SUSPENSION_FACTOR + @rear_fork_travel * MountainBike::REAR_SUSPENSION_FACTOR
+    default_off_road_ability + @front_fork_travel * MountainBike::FRONT_SUSPENSION_FACTOR + @rear_fork_travel * MountainBike::REAR_SUSPENSION_FACTOR
   end
 
   def price
-    ( 1 + @commission ) * @base_price + @front_suspension_price + @rear_suspension_price
+    defalut_price + @front_suspension_price + @rear_suspension_price
   end
 
   def upgradable_parameters

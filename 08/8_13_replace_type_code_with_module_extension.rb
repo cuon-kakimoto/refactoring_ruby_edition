@@ -1,12 +1,20 @@
-# OPTIMIZE: 条件分岐を取り除く
-#  手段としては以下の3つ
-# 「タイプコードからポリモーフィズムへ」 - タイプコードのある箇所がクラスの主要部分の場合に選択
-# 「タイプコードからモジュールのextendへ」 - タイプコードに依存しない振る舞い
-# 「タイプコードからState/Strategyへ」 - タイプコタイプコードに依存しない振る舞い
+########################################
+# タイプコードからポリモーフィズムへ。
+# - 2. 「タイプコードからモジュールのextendへ」
+# [MEMO]
 # HACK: extendとincludeの違い
-# include: インスタンス化するとモジュールで定義されたメソッドを扱えるようになる
+# include: インスタンス化するとモジュールで定義されたメソッドを扱えるようになる. でもClassMethodも定義できる。
 # extend: モジュールで定義されているメソッドを特異メソッドとして扱えるようになる
 # -> ここでは、extendで[動的]に役割を切り替えているのが重要か。
+# あ！特異メソッドとクラスメソッドは違うわ!!!特異メソッドは、インスタンスのクラスメソッドだわ。
+#
+# - ただし、extendはインスタンスを作った後に、type_codeが変わってしまうと対応できなくなりますよ。
+# - moduleがextendされるか、includeされるかはどうやって見極めるのだ？？？
+# - extend module: 内部にインスタンス変数がある。=> 特異メソッドとして扱える。
+# - include module: 内部にインスタンス変数がない。
+# - クライアントがクラスを渡したほうが、Factoryにも委譲出来る可能性があるので、良いね。
+# - ★生成と使用を分離。
+########################################
 
 class MountainBike
   TIRE_WIDTH_FACTOR = 1
@@ -29,10 +37,11 @@ class MountainBike
     @rear_suspension_price  = params[:rear_suspension_price]
   end
 
-  # OPTIMIZE: ユーザに依存性を注入させるように変更
+  # OPTIMIZE: ユーザに依存性を注入させるように変更. こんな書き方が!!!!
   def type_code=(mod)
     extend(mod)
   end
+  # HACK: 内部でextendする方法, ただのcodeを渡すかクラスを渡すかの違い。
   # def type_code=(value)
   #   @type_code = value
   #   case type_code

@@ -1,7 +1,13 @@
+########################################
+# コレクションのカプセル化
+# [MEMO]
+# - コレクションのコピーを返して、add_, removeメソッドを用意する
+# - コレクションオブジェクトを返すことがないので、内部がカプセル化される。
+########################################
+#
 class Course
   # HACK: アクセサメソッドを定義すると外部から参照できるんだな。。。
-  attr_accessor :name
-  attr_accessor :advanced
+  # なので、writerを禁じる.
   def initialize(name, advanced)
     @name = name
     @advanced = advanced
@@ -48,7 +54,7 @@ class Person
 
   # OPTIMIZE: 属性リーダが使われている箇所をクラスに移動する
   def number_of_advances_courses
-    @courses.select{ |course| course.advanced }.size
+    @courses.select{ |course| course.advanced? }.size
   end
 
   # HACK: 小さいけど絶大な感じがするリファクタリングだな。

@@ -1,10 +1,16 @@
-# OPTIMIZE: 定数を保持しているだけのクラスをフィールドに移す
+########################################
+# サブクラスからフィールドへ。
+# [MEMO]
+# - サブクラスはふるまいや機能を追加するために用意する。ただのデータ保持ならば不要。
+# 定数を保持しているだけのクラスをフィールドに移す
 # 1. ファクトリメソッドを用意する(create_female/create_male)
 # 2. スーパクラスのコンストラクタにフィールドを用意する(@female, @code)
 # 3. 既存のコンストラクタを変更(super(true, 'F'))
 # 3. ファクトリメソッド内のコンストラクタをインライン化(Person.new(true, 'F'))
 # 4. テストする
 # 5. フィールドを用意する、テストする...
+########################################
+# [GOOD]
 class Person
 
   def initialize(female, code)
@@ -32,6 +38,7 @@ class Person
   end
 end
 
+# [BAD]
 # class Female < Person
 # 
 #   def initialize
@@ -76,4 +83,5 @@ class PersonTest < Test::Unit::TestCase
     assert_equal false, bob.female?
     assert_equal 'M', bob.code
   end
+
 end
