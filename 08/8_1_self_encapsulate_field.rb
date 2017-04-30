@@ -1,3 +1,16 @@
+########################################
+# 自己カプセル化フィールド
+# [MEMO]
+# - @varibaleではなくて、attr_accessorでアクセスする。
+# - フィールドアクセスの考え方:
+# - 1. 直接変数アクセス(@variable)
+# - 2. 間接変数アクセス(attr_accessor)
+# - 1はただの値をとってきていると直感できる。
+# - 2のほうがメソッドをoverrideするときに分かりやすい。
+# - 最初は、直接変数アクセスを使えばよい。
+# - ただし、継承が入ってきたときに、派生クラスでoverrieするときは、attr_accessorを使え!
+########################################
+
 class Item
   attr_accessor :base_price, :tax_rate
 
@@ -52,6 +65,7 @@ end
 require 'test/unit'
 
 # TODO: 継承のテスト方法は、「オブジェクト指向実践ガイド」を再度読みたい
+# => IFをrespond_toでテストする感じですね!
 class ItemTest < Test::Unit::TestCase
   def test_raise_base_price_by
     i = Item.new(100, 0.05)
