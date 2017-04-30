@@ -1,3 +1,13 @@
+########################################
+# テンプレートメソッドの作成
+# [MEMO]
+# - 責務の範囲なら継承を使ってもいいけど、外れるならばNGだろうんな。
+# - メソッドオブジェクトを使ってコードを分離する。やっぱりこの、メソッドに対してクラスを分離って思いつかんわ。
+# - Strategyパターンで実装 = 状態はもたないで内部処理(アルゴリズム)が変わる。
+# - templateパターンってstartegyを切り替えることでメリットがあるんだよな。
+# - Statementクラスが直接インスタンス化されないなら継承を使うメリットはない。
+# - そして今回は使っていない。
+########################################
 module DefaultPrice
   def frequent_renter_points(days_rented)
     1
@@ -101,7 +111,6 @@ class Customer
 end
 
 # OPTIMIZE: コードの重複を取り除くため、継承を使ってテンプレートメソッドを用意
-# OPTIMIZE: Strategyパターンで実装
 class Statement
   #OPTIMIZE: しかし、Statementクラスのインスタンスが作られないなら、モジュールを使うほうが良さそう
   def self.value(customer)
@@ -149,9 +158,9 @@ class HtmlStatement < Statement
 end
 
 
-#HACK: 継承方式でtemplateを使った場合、他の表示形式が来た場合に3つのクラスができてエグいことになった。。。
+#HACK: 継承方式でtemplateを使った場合、他の表示形式(週末用など)が来た場合に3つのクラスができてエグいことになった。。。
+# 状態数 * メール形式の数だけクラスができる! => 状態爆発!!!
 #これはやりたくない！！！
-#Pattern1
 class WeekendStatement; end
 class TextWeekendStatement1 < WeekendStatement; end
 class HtmlWeekendStatement1 < WeekendStatement; end
