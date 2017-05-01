@@ -1,4 +1,36 @@
-# OPTIMIZE: 問い合わせメソッドと更新メソッドを分離
+########################################
+# 問い合わせメソッドと更新メソッドを分離
+# [MEMO]
+# - 副作用のあるメソッドは更新するだけにすべし。
+########################################
+
+# [BAD]
+#class Guard
+#  def check_security(people)
+#    found = found_miscreant(people)
+#  end
+#
+#  def found_miscreant(people)
+#    people.each do |person|
+#      if person == 'Don'
+#        send_alert
+#        return "Don"
+#      end
+#      if person == 'John'
+#        send_alert
+#        return "John"
+#      end
+#    end
+#    ""
+#  end
+#
+#  def send_alert
+#    puts "容疑者発見"
+#  end
+#
+#end
+
+# [GOOD]
 class Guard
   def check_security(people)
     send_alert_if_miscreant_in(people)
@@ -23,7 +55,6 @@ class Guard
   #   ""
   # end
 
-  # OPTIMIZE: 更新メソッド
   # OPTIMIZE: 更新メソッドは問い合わせメソッドを利用するように置き換える
   def send_alert_if_miscreant_in(people)
     send_alert unless found_person(people).empty?
