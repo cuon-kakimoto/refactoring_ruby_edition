@@ -1,52 +1,67 @@
 ########################################
 # 制御フラグの除去
+# - 制御フラグ情報に加えて、結果情報を返すreturn
 # [MEMO]
-# - 制御フラグを使うなら、next, breakを使おう
+# - peopleループがpersonになるんですね。この感覚はなかった。
 ########################################
 
 # [BAD]
 #class Guard
 #  def check_security(people)
-#    found = false
-#    people.map do |person|
-#      unless found
+#    found = ""
+#    # HACK: foundは結果を知らせているので、ループをメソッドにする。
+#    people.each do |person|
+#      if found == ""
 #        if person == 'Don'
 #          send_alert
-#          found = true
+#          found = 'Don'
 #        end
 #        if person == 'John'
 #          send_alert
-#          found = true
+#          found = 'John'
 #        end
 #      end
 #    end
+#    more_alert(found)
 #  end
 #
 #  def send_alert
 #    puts "容疑者発見"
 #  end
+#
+#  def more_alert(found)
+#    puts found
+#  end
 #end
 
 # [GOOD]
-# OPTIMIZE: 制御フラグをbreak文に置き換える
 class Guard
   def check_security(people)
-    found = false
-    people.map do |person|
+    found = found_miscreant(people)
+    more_alert(found)
+  end
+
+  # 制御フラグも取り除く、これ分かりやすいかな？？？
+  def found_miscreant(people)
+    people.each do |person|
       if person == 'Don'
-        # HACK: 内部で標準出力(副作用)を利用してるのはまずいな。
         send_alert
-        break
+        return 'Don'
       end
       if person == 'John'
         send_alert
-        break
+        return 'John'
       end
     end
+    ""
   end
 
   def send_alert
     puts "容疑者発見"
+  end
+
+  def more_alert(found)
+    puts found
   end
 end
 
@@ -65,7 +80,7 @@ class GuardTest < Test::Unit::TestCase
   # 失敗すると、tagが表示されてわかりよい!
   data(
     # tag: [ expected, target ]
-    list1: ["容疑者発見", ['Shinji', 'Don', 'John']],
+    list1: ["容疑者発見\nDon", ['Shinji', 'Don', 'John']],
     list2: ["", ['Shinji', 'Haruna']],
   )
   def test_check_security_any(data)

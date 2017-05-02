@@ -1,14 +1,34 @@
+########################################
+# 条件式の結合
+# [MEMO]
+# - 条件式のテストが明確になる
+# - メソッドに適切に名前がつけられることが条件
+# - メソッド抽出するにしても、それを公開I/Fにするかどうかは別ですよね。。。
+# - もしかしたら、# メソッドは別の場所がふさわしいのかもしれないし。
+########################################
+
+# [BAD]
+#class Benefit
+#  def initialize(params)
+#    params.each{ |key, value| instance_variable_set "@#{key}", value }
+#  end
+#
+#  def disability_amount
+#    # HACK: こういうテストしにくいコードは本当にいけてないよね。
+#    return 0 if @seniority < 2
+#    return 0 if @months_disabled < 12
+#    return 0 if @is_part_time
+#    1000
+#  end
+#end
+
+# [GOOD]
 class Benefit
   def initialize(params)
     params.each{ |key, value| instance_variable_set "@#{key}", value }
   end
 
   def disability_amount
-    # HACK: こういうテストしにくいコードは本当にいけてないよね。
-    # return 0 if @seniority < 2
-    # return 0 if @months_disabled < 12
-    # return 0 if @is_part_time
-    # 1000
     # OPTIMIZE: シーケンスの条件分はORの結合と同じ
     return 0 if ineligible_for_disability
     1000
