@@ -134,3 +134,40 @@ class ProductControllerTest < Test::Unit::TestCase
     assert_equal Product, @product_controller.product.class
   end
 end
+
+
+
+########################################
+## Facotryメソッドについて考察
+########################################
+#[Railsのコードを読む]
+#initializeで別クラスのコンストラクタはガシガシ読んでいる。
+#また、labmdaをごりごり渡していたり、30行以上のinitalizeなど、結構重そうな処理をしてるクラスもある。
+#% actionpack/lib/action_dispatch/routing/mapper.rb
+#  結構重いinitialize. 50行ぐらい有り。
+#  基本的にinitializeで全部やればいいと思ってしまった。
+#内部で自クラスのメソッドを読んでいるのもあった。(反証発見)
+#% actionpack/lib/action_dispatch/testing/assertion_response.rb:18:
+#  ※ただし、読んでいるメソッドはprivateになっている。
+#actionview/lib/action_view/base.rb:197
+#  こっちでは、publicになっている。
+#
+#
+#[memo]initialize内でextendしてるクラスを発見
+#初めてみたわ。
+#% activejob/test/support/integration/jobs_manager.rb
+#class JobsManager
+#  def initialize(adapter_name)
+#    @adapter_name = adapter_name
+#    require_relative "adapters/#{adapter_name}"
+#    extend "#{adapter_name.camelize}JobsManager".constantize
+#  end
+#end
+#
+#Facotryメソッド
+#  コンストラクタ名が変わるから、後でgrepする時に漏れが生じる。
+#  コードはわかりやすくなるけれども、フレームワークで共通のFacotryメソッドとして規約を作ったほうがうまくいくかな。
+#  アプリケーションでファクトリメソッドをcomposeとしても、他からは認識できない。
+#  アプリケーションでファクトリメソッドを使うよりは、ファクトリオブジェクトとしてクラス抽出した方がいいかな。
+#  もしくは、railsを使っているなら、createを使えばいいじゃん(笑)わざわざ道を外れる必要はない。
+#  composeというカッコつけは止めよう。
