@@ -1,3 +1,9 @@
+########################################
+# 配列からオブジェクトへ
+# [MEMO]
+# - Arrayの「第一要素は人の名前」というルールは覚えにくい。
+# - => オブジェクトにしてしまおう!
+########################################
 require 'test/unit'
 
 class Performance
@@ -8,11 +14,11 @@ class Performance
     @wins.to_i
   end
 
-  # OPTIMIZE: アクセサを定義したので不要にできる
   def initialize
     @data = []
   end
 
+  # OPTIMIZE: アクセサを定義したので不要にできる
   # HACK: '[index] = value'で使える。paserがよしなにやってくれてるんだろう
   def []=(index,value)
     @data.insert(index, value)
@@ -22,6 +28,7 @@ class Performance
     @data[index]
   end
 end
+
 class ArrayTest < Test::Unit::TestCase
   # OPTIMIZE: Arrayに異なる種類の情報を格納すべきでない。第一要素は人の名前というルールは覚えにくい。
   # オブジェクトを使えば、フィールドとメソッドを伝えることができる

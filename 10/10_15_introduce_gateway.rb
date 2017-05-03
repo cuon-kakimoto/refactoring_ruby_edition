@@ -1,9 +1,18 @@
+########################################
+# ゲートウェイの導入
+# [MEMO]
+# - 「外部システムやリソースを操作するための必要な複雑なAPIを単純な形で提供したい」
+# - 外部システムやリソースへのアクセスをカプセル化するゲートウェイを導入する
+# - 「Facede」パターンか。
+########################################
+
 require 'uri'
 require 'net/http'
 
 # OPTIMIZE: GatewayAPIの作成
 # 各クラスごとにサーバーへのpost方法が異なり、それぞれのクラスで実装がされていて煩雑。
 # サーバへの送信を一元化するGatewayを作成する。
+# Templateで共通化できるほど似てもいない。
 class Gateway
   # HACK: subjectにはPerson/Compnay...クラスのインスタンスが設定される。
   attr_accessor :subject, :attributes, :to, :authenticate
